@@ -22,6 +22,9 @@ layout: default
   <div class="market-list">
     {% assign kind_groups = page.spots | group_by: 'kindLabel' %}
     {% for group in kind_groups %}
+    {% unless forloop.first %}
+    <div class="ad-slot">{% include ad.html %}</div>
+    {% endunless %}
     <div class="days-group">
       <h2 class="days-group-title">
         <span>{{ group.items.first.kindIcon }} {{ group.name }}</span>
