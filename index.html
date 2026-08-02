@@ -1,0 +1,140 @@
+---
+layout: default
+title: 전국 해수욕장·계곡 정보 총정리 (2026년)
+description: 전국 424곳 해수욕장·계곡 정보 총정리! 지역별 여름 물놀이 명소를 한눈에 확인하고, 이용시간·주차·편의시설까지 무료로 확인하세요.
+---
+
+<div class="home-layout">
+<div class="home-page">
+
+  <div class="home-hero">
+    <h1>🏖️ 전국 물놀이 명소 한눈에</h1>
+    <p>전국 {{ site.data.splash_spots | size }}곳 해수욕장·계곡 위치·이용시간·주차정보</p>
+  </div>
+
+  <!-- 검색 -->
+  <div class="search-wrap">
+    <div class="search-box-wrap">
+      <input type="text" id="searchBox" class="search-box" placeholder="장소명, 지역 검색...">
+    </div>
+    <div class="search-results" id="searchResults"></div>
+  </div>
+
+  <!-- 광고 1 -->
+  <div class="ad-slot" style="padding:0;margin-bottom:32px;">{% include ad.html %}</div>
+
+  <!-- 유형별 찾기 -->
+  <div class="home-section">
+    <h2>🌊 유형별로 찾기</h2>
+    <div class="days-btn-grid">
+      <a href="/kind/beach/" class="days-btn">🏖️ 해수욕장 (233곳)</a>
+      <a href="/kind/valley/" class="days-btn">🏞️ 계곡 (191곳)</a>
+    </div>
+  </div>
+
+  <!-- 지역별 찾기 -->
+  <div class="home-section">
+    <h2>🗺️ 지역별로 찾기</h2>
+    <div class="region-btn-grid">
+      {% assign regions_data = site.data.splash_spots | group_by: 'region' | sort: 'name' %}
+      {% for rg in regions_data %}
+      {% assign slug = rg.items.first.regionSlug %}
+      <a href="/region/{{ slug }}/" class="region-btn">
+        {{ rg.name }}
+        <span class="count">{{ rg.items | size }}곳</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- 광고 2 -->
+  <div class="ad-slot" style="padding:0;margin-bottom:32px;">{% include ad.html %}</div>
+
+  <!-- 추천 명소 -->
+  <div class="home-section">
+    <h2>⭐ 가볼만한 물놀이 명소</h2>
+    <div class="top-market-grid">
+      {% assign featured = "jeonnam-beach-001,chungnam-beach-001,busan-beach-002,gangwon-beach-001,incheon-beach-001,jeonbuk-beach-003,gyeongbuk-beach-002,jeju-beach-001,gyeongnam-beach-001,gyeonggi-beach-001,ulsan-beach-001,jeonnam-valley-001,chungbuk-valley-001,chungnam-valley-001,jeonbuk-valley-001,gyeongnam-valley-001" | split: ',' %}
+      {% for fid in featured %}
+      {% assign s = site.data.splash_spots | where: 'slug', fid | first %}
+      {% if s %}
+      <a href="/spot/{{ s.slug }}/" class="top-market-card" style="padding:0;overflow:hidden;">
+        {% if s.image and s.image != "" %}
+        <img class="market-card-img" src="{{ s.image }}" alt="{{ s.spotName }}" loading="lazy">
+        <div class="market-card-body">
+        {% endif %}
+        <div class="top-card-name">{{ s.spotName }}</div>
+        <div class="top-card-region">{{ s.region }} · {{ s.city }} · {{ s.kindIcon }} {{ s.kindLabel }}</div>
+        {% if s.image and s.image != "" %}</div>{% endif %}
+      </a>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- 이용 안내 -->
+  <div class="guide-section">
+    <h2>ℹ️ 이용 안내</h2>
+    <ul class="guide-list">
+      <li>🏖️ 해수욕장 개장기간은 보통 7~8월이며, 그 외 기간엔 안전요원이 없을 수 있습니다</li>
+      <li>🏞️ 계곡은 우기·장마철 급류에 주의하시고, 어린이 동반 시 항상 보호자가 함께해주세요</li>
+      <li>🅿️ 주차·편의시설 현황은 계절과 방문객 수에 따라 달라질 수 있습니다</li>
+      <li>⚠️ 본 정보는 한국관광공사 관광정보 데이터 기준이며 변경될 수 있습니다.</li>
+    </ul>
+  </div>
+
+</div>
+
+<aside class="home-sidebar">
+  {% include ad.html slot="6255378195" label="사이드바" %}
+</aside>
+
+</div>
+
+<!-- Fuse.js 검색 -->
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@7/dist/fuse.min.js"></script>
+<script>
+(async function() {
+  let spots = [];
+  try {
+    const res = await fetch('/search_index.json');
+    spots = await res.json();
+  } catch(e) { return; }
+
+  const fuse = new Fuse(spots, {
+    keys: ['name', 'region', 'city'],
+    threshold: 0.35,
+    minMatchCharLength: 1,
+  });
+
+  const searchBox = document.getElementById('searchBox');
+  const searchResults = document.getElementById('searchResults');
+
+  searchBox.addEventListener('input', function() {
+    const q = this.value.trim();
+    if (!q) { searchResults.classList.remove('active'); return; }
+    const results = fuse.search(q).slice(0, 12);
+    if (results.length === 0) {
+      searchResults.innerHTML = '<div style="padding:12px 16px;color:#6B7280;">검색 결과가 없습니다.</div>';
+    } else {
+      searchResults.innerHTML = results.map(r => {
+        const s = r.item;
+        return `<a href="/spot/${s.slug}/" class="search-result-item">
+          ${s.image ? `<img class="search-result-thumb" src="${s.image}" alt="">` : ''}
+          <span>
+            <span class="search-result-name">${s.name}</span>
+            <span class="search-result-meta">${s.region} · ${s.kindLabel}</span>
+          </span>
+        </a>`;
+      }).join('');
+    }
+    searchResults.classList.add('active');
+  });
+
+  document.addEventListener('click', e => {
+    if (!searchBox.contains(e.target) && !searchResults.contains(e.target)) {
+      searchResults.classList.remove('active');
+    }
+  });
+})();
+</script>

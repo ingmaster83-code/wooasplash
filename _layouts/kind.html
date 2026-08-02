@@ -1,0 +1,58 @@
+---
+layout: default
+---
+
+<div class="market-layout">
+<div class="list-page">
+
+  <nav class="breadcrumb">
+    <a href="/">홈</a>
+    <span>›</span>
+    <span>{{ page.kind_label }}</span>
+  </nav>
+
+  <div class="list-header">
+    <h1>{{ page.kind_icon }} 전국 {{ page.kind_label }}</h1>
+    <p class="list-count">전국 {{ page.spots | size }}곳</p>
+  </div>
+
+  <!-- 광고 -->
+  <div class="ad-slot">{% include ad.html %}</div>
+
+  {% assign by_region = page.spots | group_by: 'region' | sort: 'name' %}
+  {% for group in by_region %}
+  {% assign r_slug = group.items.first.regionSlug %}
+  <div class="region-section">
+    <h2 class="region-section-title">
+      <a href="/region/{{ r_slug }}/">{{ group.name }}</a>
+      <span class="group-count">{{ group.items | size }}곳</span>
+    </h2>
+    <div class="market-cards">
+      {% for spot in group.items %}
+      <a href="/spot/{{ spot.slug }}/" class="market-card {% if spot.image and spot.image != '' %}has-img{% endif %}">
+        {% if spot.image and spot.image != "" %}
+        <img class="market-card-img" src="{{ spot.image }}" alt="{{ spot.spotName }}" loading="lazy">
+        <div class="market-card-body">
+        {% endif %}
+        <div class="card-name">{{ spot.spotName }}</div>
+        <div class="card-city">{{ spot.city }}</div>
+        {% if spot.image and spot.image != "" %}</div>{% endif %}
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+
+  <div class="days-nav">
+    <h3>다른 유형</h3>
+    <div class="days-btn-grid">
+      {% unless page.kind_slug == "beach" %}<a href="/kind/beach/" class="days-btn-sm">🏖️ 해수욕장</a>{% endunless %}
+      {% unless page.kind_slug == "valley" %}<a href="/kind/valley/" class="days-btn-sm">🏞️ 계곡</a>{% endunless %}
+    </div>
+  </div>
+
+</div>
+<aside class="market-sidebar">
+  {% include ad.html slot="6255378195" label="사이드바" %}
+</aside>
+</div>

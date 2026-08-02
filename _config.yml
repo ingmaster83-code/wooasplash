@@ -1,0 +1,25 @@
+title: 우아스플래시 - 전국 해수욕장·계곡 정보
+description: 전국 424곳 해수욕장·계곡 정보를 한눈에 확인하세요. 지역별 여름 물놀이 명소, 이용시간·주차·편의시설 안내.
+url: "https://wooasplash.wooahouse.com"
+baseurl: ""
+lang: ko
+timezone: Asia/Seoul
+author: WooaHouse
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+
+plugins:
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - scripts/
+  - "*.py"
+  - README.md
+  - .gitignore
+  - vendor/

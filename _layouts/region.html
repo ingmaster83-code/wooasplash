@@ -1,0 +1,64 @@
+---
+layout: default
+---
+
+<div class="market-layout">
+<div class="list-page">
+
+  <nav class="breadcrumb">
+    <a href="/">홈</a>
+    <span>›</span>
+    <span>{{ page.region }} 물놀이 명소</span>
+  </nav>
+
+  <div class="list-header">
+    <h1>🗺️ {{ page.region }} 해수욕장·계곡</h1>
+    <p class="list-count">총 {{ page.spots | size }}곳</p>
+  </div>
+
+  <!-- 광고 -->
+  <div class="ad-slot">{% include ad.html %}</div>
+
+  <div class="market-list">
+    {% assign kind_groups = page.spots | group_by: 'kindLabel' %}
+    {% for group in kind_groups %}
+    <div class="days-group">
+      <h2 class="days-group-title">
+        <span>{{ group.items.first.kindIcon }} {{ group.name }}</span>
+        <span class="group-count">{{ group.items | size }}곳</span>
+      </h2>
+      <div class="market-cards">
+        {% for spot in group.items %}
+        <a href="/spot/{{ spot.slug }}/" class="market-card {% if spot.image and spot.image != '' %}has-img{% endif %}">
+          {% if spot.image and spot.image != "" %}
+          <img class="market-card-img" src="{{ spot.image }}" alt="{{ spot.spotName }}" loading="lazy">
+          <div class="market-card-body">
+          {% endif %}
+          <div class="card-name">{{ spot.spotName }}</div>
+          <div class="card-city">{{ spot.city }}</div>
+          {% if spot.image and spot.image != "" %}</div>{% endif %}
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="region-nav">
+    <h3>다른 지역</h3>
+    <div class="region-btn-grid">
+      {% assign all_regions = site.data.splash_spots | map: 'region' | uniq | sort %}
+      {% for r in all_regions %}
+      {% assign r_slug = site.data.splash_spots | where: 'region', r | first %}
+      {% if r != page.region %}
+      <a href="/region/{{ r_slug.regionSlug }}/" class="region-btn-sm">{{ r }}</a>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+<aside class="market-sidebar">
+  {% include ad.html slot="6255378195" label="사이드바" %}
+</aside>
+</div>
