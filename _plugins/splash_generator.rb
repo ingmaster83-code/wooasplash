@@ -5,9 +5,13 @@ module Jekyll
     safe true
     priority :normal
 
+    TIDE_MAX_DIST_DEG = 0.5 # 대략 50km 이내일 때만 연결
+
     def generate(site)
       spots = site.data['splash_spots']
       return unless spots&.any?
+
+      tide_spots = site.data['tide_lookup'] || []
 
       Jekyll.logger.info "SplashGenerator:", "#{spots.size}개 페이지 생성 중..."
 
@@ -36,7 +40,7 @@ module Jekyll
           next_spot = { 'slug' => n['slug'], 'name' => n['spotName'] }
         end
 
-        site.pages << SplashSpotPage.new(site, spot, same_region, same_kind, prev_spot, next_spot)
+        site.pages << SplashSpotPage.new(site, spot, same_region, same_kind, prev_spot, next_spot, nearest_tide_spot(spot, tide_spots))
       end
 
       by_region = spots.group_by { |s| s['region'] }
@@ -54,10 +58,25 @@ module Jekyll
 
       Jekyll.logger.info "SplashGenerator:", "완료 (#{spots.size}개)"
     end
+
+    def nearest_tide_spot(spot, tide_spots)
+      return nil unless spot['kind'] == 'beach'
+      return nil if spot['lat'].to_s.empty? || spot['lng'].to_s.empty? || tide_spots.empty?
+
+      s_lat = spot['lat'].to_f
+      s_lng = spot['lng'].to_f
+      best, best_d = nil, nil
+      tide_spots.each do |t|
+        d = (t['lat'].to_f - s_lat)**2 + (t['lot'].to_f - s_lng)**2
+        best, best_d = t, d if best_d.nil? || d < best_d
+      end
+      return nil if best.nil? || Math.sqrt(best_d) > TIDE_MAX_DIST_DEG
+      best
+    end
   end
 
   class SplashSpotPage < Page
-    def initialize(site, spot, same_region, same_kind, prev_spot, next_spot)
+    def initialize(site, spot, same_region, same_kind, prev_spot, next_spot, nearest_tide = nil)
       @site = site
       @base = site.source
       @dir  = "spot/#{spot['slug']}"
@@ -71,6 +90,7 @@ module Jekyll
       self.data['same_kind']   = same_kind
       self.data['prev_spot']   = prev_spot
       self.data['next_spot']   = next_spot
+      self.data['nearestTide'] = nearest_tide
 
       self.data['title'] = "#{spot['spotName']} 위치·이용시간·주차정보 | #{spot['region']} #{spot['city']} #{spot['kindLabel']}"
       overview_short = (spot['overview'] || '').to_s

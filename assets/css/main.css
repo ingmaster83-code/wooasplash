@@ -440,3 +440,15 @@ img { max-width: 100%; }
 }
 .our-sites-links a:hover { background: rgba(255,255,255,.12); color: #fff; }
 .our-sites-links a.active { background: rgba(255,255,255,.18); color: #fff; }
+
+.tide-crosslink-banner {
+  margin: 16px 0; padding: 14px 18px; background: linear-gradient(135deg, var(--primary-light), #ECFEFF);
+  border: 1px solid #BAE6FD; border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+}
+.tide-crosslink-banner span { font-size: .9rem; color: var(--text); }
+.tide-crosslink-banner a {
+  background: var(--primary); color: #fff; padding: 8px 16px; border-radius: 8px;
+  font-weight: 700; font-size: .86rem; white-space: nowrap; text-decoration: none;
+}
+.tide-crosslink-banner a:hover { background: var(--primary-dark); text-decoration: none; }
